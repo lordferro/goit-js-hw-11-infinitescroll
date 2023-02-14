@@ -92,7 +92,7 @@ function createMarkup({
   downloads,
 }) {
   return ` <div class="photo-card">
-      <img src=${webformatURL} alt="" style="width: 300px" loading="lazy" />
+     <div class="picture-container"> <img src=${webformatURL} alt="" style="max-height: 100%;  width: 300px" loading="lazy" /></div>
       <div class="info">
         <p class="info-item">
           <b>Likes ${likes}</b>

@@ -1,5 +1,5 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import loadMoreBtn from './js/loadMoreBtn';
+import { loadMoreBtn } from './js/loadMoreBtn';
 import PictureApi from './js/pictureApi';
 
 const refs = {

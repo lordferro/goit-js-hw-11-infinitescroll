@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import PictureApi from './js/pictureApi';
 import loadMoreBtn from './js/loadMoreBtn';
+import PictureApi from './js/pictureApi';
 
 const refs = {
   form: document.querySelector('.search-form'),

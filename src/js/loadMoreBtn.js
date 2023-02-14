@@ -1,4 +1,4 @@
-export default loadMoreBtn = {
+export const loadMoreBtn = {
   button: document.querySelector('.load-more'),
 
 

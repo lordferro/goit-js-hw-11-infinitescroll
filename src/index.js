@@ -1,6 +1,11 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { loadMoreBtn } from './js/loadMoreBtn';
 import PictureApi from './js/pictureApi';
+// Описан в документации
+import SimpleLightbox from 'simplelightbox';
+// Дополнительный импорт стилей
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import 'simplelightbox/dist/simple-lightbox.min.js';
 
 const refs = {
   form: document.querySelector('.search-form'),
@@ -17,7 +22,13 @@ function onLoadMoreClick() {
 
 function onFormSubmit(event) {
   event.preventDefault();
+
+  if (event.currentTarget.elements.searchQuery.value.trim() === '') {
+    Notify.info("Please enter your request.")
+    return;
+  }
   pictureApi.searchQuery = event.currentTarget.elements.searchQuery.value;
+
   loadMoreBtn.hide();
   pictureApi.pageReset();
   clearMarkup();
@@ -36,20 +47,19 @@ function fetchData() {
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
-         return;
+        return;
       } else if (
         pictures.data.hits.length < 40 &&
         pictures.data.hits.length > 0
-        
       ) {
         loadMoreBtn.hide();
         Notify.warning(
           "We're sorry, but you've reached the end of search results."
         );
         appendPictures(pictures);
-        return
-        } else {
-                    loadMoreBtn.enable();
+        return;
+      } else {
+        loadMoreBtn.enable();
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         appendPictures(pictures);
       }
@@ -80,6 +90,7 @@ function appendPictures({ data: { hits } }) {
   }, '');
 
   refs.gallery.insertAdjacentHTML('beforeend', markupPictures);
+  lightbox.refresh();
 }
 
 function createMarkup({
@@ -92,7 +103,7 @@ function createMarkup({
   downloads,
 }) {
   return ` <div class="photo-card">
-     <div class="picture-container"> <img src=${webformatURL} alt="" style="max-height: 100%;  width: 300px" loading="lazy" /></div>
+     <div class="picture-container"> <a class="gallery__item" href=${largeImageURL}><img class="gallery__image" src=${webformatURL} alt=""  loading="lazy" /></a></div>
       <div class="info">
         <p class="info-item">
           <b>Likes ${likes}</b>
@@ -113,3 +124,5 @@ function createMarkup({
 function clearMarkup() {
   refs.gallery.innerHTML = '';
 }
+
+var lightbox = new SimpleLightbox('.gallery a', {});

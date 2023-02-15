@@ -11,8 +11,8 @@ export default class PictureApi {
         this.page = 1;
     }
 
-   async fetchData() {
-    const data =  await axios.get(
+   fetchData() {
+    const data = axios.get(
       `${URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`
        );
        

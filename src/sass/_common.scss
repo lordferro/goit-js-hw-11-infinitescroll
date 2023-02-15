@@ -47,6 +47,7 @@ button:hover {
         }
 
 .picture-container{
+  padding: 3px;
   height: 252px;
 }
         .photo-card {
@@ -58,4 +59,9 @@ button:hover {
 
 .photo-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.picture-container img {
+  width:300px;
+  max-height:max-content;
 }

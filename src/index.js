@@ -74,7 +74,7 @@ function fetchData() {
 function onScroll() {
   const userViewHeight = document.documentElement.clientHeight;
   const totalHeight = document.documentElement.scrollHeight;
-  scrolled = window.pageYOffset;
+  let scrolled = window.pageYOffset;
 
   if (totalHeight - scrolled - 1 < userViewHeight) {
     Notify.warning(

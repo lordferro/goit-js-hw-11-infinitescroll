@@ -7,6 +7,8 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
 
+var throttle = require('lodash.throttle');
+
 const refs = {
   form: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
@@ -24,7 +26,7 @@ function onFormSubmit(event) {
   event.preventDefault();
 
   if (event.currentTarget.elements.searchQuery.value.trim() === '') {
-    Notify.info("Please enter your request.")
+    Notify.info('Please enter your request.');
     return;
   }
   pictureApi.searchQuery = event.currentTarget.elements.searchQuery.value;
@@ -53,10 +55,12 @@ function fetchData() {
         pictures.data.hits.length > 0
       ) {
         loadMoreBtn.hide();
-        Notify.warning(
-          "We're sorry, but you've reached the end of search results."
-        );
         appendPictures(pictures);
+        window.document.addEventListener(
+          'scroll',
+          throttle(onScroll, 800, { leading: true })
+        );
+
         return;
       } else {
         loadMoreBtn.enable();
@@ -66,16 +70,30 @@ function fetchData() {
     })
     .catch(error => error);
 }
+
+function onScroll() {
+  const userViewHeight = document.documentElement.clientHeight;
+  const totalHeight = document.documentElement.scrollHeight;
+  scrolled = window.pageYOffset;
+
+  if (totalHeight - scrolled - 1 < userViewHeight) {
+    Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
+}
+
 function fetchMoreData() {
   pictureApi
     .fetchData()
     .then(pictures => {
       if (pictures.data.hits.length < 40 && pictures.data.hits.length > 0) {
         loadMoreBtn.hide();
-        Notify.warning(
-          "We're sorry, but you've reached the end of search results."
-        );
         appendPictures(pictures);
+        window.document.addEventListener(
+          'scroll',
+          throttle(onScroll, 800, { leading: true })
+        );
         return;
       }
       loadMoreBtn.enable();

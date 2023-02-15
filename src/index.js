@@ -91,6 +91,7 @@ function fetchMoreData() {
       if (pictures.data.hits.length < 40 && pictures.data.hits.length > 0) {
         loadMoreBtn.hide();
         appendPictures(pictures);
+        let scrolled = 0;
         window.document.addEventListener(
           'scroll',
           throttle(onScroll, 800, { leading: true })

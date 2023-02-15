@@ -56,6 +56,7 @@ function fetchData() {
       ) {
         loadMoreBtn.hide();
         appendPictures(pictures);
+        let scrolled = 0;
         window.document.addEventListener(
           'scroll',
           throttle(onScroll, 800, { leading: true })

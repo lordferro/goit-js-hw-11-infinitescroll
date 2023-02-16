@@ -8,6 +8,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
 
 var throttle = require('lodash.throttle');
+window.scrollBy(0, 13000);
+console.log(window);
 
 const refs = {
   form: document.querySelector('.search-form'),
@@ -78,8 +80,7 @@ var onscroll = throttle(onScroll, 800);
 function onScroll() {
   const userViewHeight = document.documentElement.clientHeight;
   const totalHeight = document.documentElement.scrollHeight;
-  let scrolled = window.pageYOffset;
-  console.log(scrolled);
+  let scrolled = window.pageYOffset;  
   if (totalHeight - scrolled - 1 < userViewHeight) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."

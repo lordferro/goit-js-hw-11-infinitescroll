@@ -56,14 +56,14 @@ function fetchData() {
       ) {
         loadMoreBtn.hide();
         appendPictures(pictures);
+        Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
+        onNoScroll();
         let scrolled = 0;
-        window.document.addEventListener(
-          'scroll',
-          throttle(onScroll, 800, { leading: true })
-        );
+        window.document.addEventListener('scroll', onscroll);
 
         return;
       } else {
+        window.document.removeEventListener('scroll', onscroll);
         loadMoreBtn.enable();
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         appendPictures(pictures);
@@ -72,16 +72,31 @@ function fetchData() {
     .catch(error => error);
 }
 
+// create a variable to cancel event listener later
+var onscroll = throttle(onScroll, 800);
+
 function onScroll() {
   const userViewHeight = document.documentElement.clientHeight;
   const totalHeight = document.documentElement.scrollHeight;
   let scrolled = window.pageYOffset;
-
+  console.log(scrolled);
   if (totalHeight - scrolled - 1 < userViewHeight) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
   }
+}
+
+function onNoScroll() {
+  if (
+    document.documentElement.clientHeight ===
+    document.documentElement.scrollHeight
+  ) {
+    Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
+  return;
 }
 
 function fetchMoreData() {
@@ -92,10 +107,7 @@ function fetchMoreData() {
         loadMoreBtn.hide();
         appendPictures(pictures);
         let scrolled = 0;
-        window.document.addEventListener(
-          'scroll',
-          throttle(onScroll, 800, { leading: true })
-        );
+        window.document.addEventListener('scroll', onscroll);
         return;
       }
       loadMoreBtn.enable();

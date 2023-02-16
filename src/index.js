@@ -8,8 +8,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
 
 var throttle = require('lodash.throttle');
-window.scrollBy(0, 13000);
-console.log(window);
 
 const refs = {
   form: document.querySelector('.search-form'),

@@ -6,6 +6,7 @@ import SimpleLightbox from 'simplelightbox';
 // Дополнительный импорт стилей
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
+import InfiniteScroll from 'infinite-scroll';
 
 var throttle = require('lodash.throttle');
 
@@ -15,12 +16,12 @@ const refs = {
 };
 const pictureApi = new PictureApi();
 
-refs.form.addEventListener('submit', onFormSubmit);
-loadMoreBtn.button.addEventListener('click', onLoadMoreClick);
+// let infScroll = new InfiniteScroll(refs.gallery, {
+//   path: 
+// })
 
-function onLoadMoreClick() {
-  fetchMoreData();
-}
+refs.form.addEventListener('submit', onFormSubmit);
+loadMoreBtn.button.addEventListener('click', fetchMoreData);
 
 function onFormSubmit(event) {
   event.preventDefault();
@@ -29,6 +30,7 @@ function onFormSubmit(event) {
     Notify.info('Please enter your request.');
     return;
   }
+
   pictureApi.searchQuery = event.currentTarget.elements.searchQuery.value;
 
   loadMoreBtn.hide();
@@ -36,11 +38,11 @@ function onFormSubmit(event) {
   clearMarkup();
   loadMoreBtn.show();
   loadMoreBtn.disable();
-  fetchData();
+  fetchData(); 
   refs.form.reset();
 }
 
-function fetchData() {
+async function fetchData() {
   pictureApi
     .fetchData()
     .then(pictures => {
@@ -69,7 +71,10 @@ function fetchData() {
         appendPictures(pictures);
       }
     })
-    .catch(error => error);
+    .catch(error => {
+      loadMoreBtn.hide();
+    Notify.failure(`there is an error ${error}`);
+    });
 }
 
 // create a variable to cancel event listener later
@@ -78,7 +83,7 @@ var onscroll = throttle(onScroll, 800);
 function onScroll() {
   const userViewHeight = document.documentElement.clientHeight;
   const totalHeight = document.documentElement.scrollHeight;
-  let scrolled = window.pageYOffset;  
+  let scrolled = window.pageYOffset;
   if (totalHeight - scrolled - 1 < userViewHeight) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."

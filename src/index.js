@@ -7,7 +7,6 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
 
-
 var throttle = require('lodash.throttle');
 
 const refs = {
@@ -30,18 +29,17 @@ function onFormSubmit(event) {
 
   pictureApi.pageReset();
   clearMarkup();
-  fetchData(); 
+  fetchData();
   refs.form.reset();
 }
 
 async function fetchData() {
   pictureApi
-  .fetchData()
-  .then(pictures => {
+    .fetchData()
+    .then(pictures => {
       window.document.removeEventListener('scroll', onscroll);
       window.document.removeEventListener('scroll', infScroll);
       if (pictures.data.hits.length === 0) {
-    
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
@@ -53,40 +51,42 @@ async function fetchData() {
         appendPictures(pictures);
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         onNoScroll();
+
         window.document.addEventListener('scroll', onscroll);
 
         return;
       } else {
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         appendPictures(pictures);
-        window.document.addEventListener("scroll", infScroll)
+
+        window.document.addEventListener('scroll', infScroll);
       }
     })
     .catch(error => {
-    Notify.failure(`there is an error ${error}`);
+      Notify.failure(`there is an error ${error}`);
     });
 }
 
 // create a variable to cancel event listener later
 const onscroll = throttle(() => {
   if (
-    window.scrollY + window.innerHeight + 0.25 >=
+    window.scrollY + window.innerHeight + 1 >=
     document.documentElement.scrollHeight
   ) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
   }
+
 }, 800);
 
 const infScroll = throttle(() => {
   if (
-    window.scrollY + window.innerHeight +1 >=
+    window.scrollY + window.innerHeight + 1 >=
     document.documentElement.scrollHeight
   ) {
-
     fetchMoreData();
-    Loading.remove()
+    Loading.remove();
   }
 }, 800);
 
@@ -110,6 +110,13 @@ function fetchMoreData() {
       if (pictures.data.hits.length < 40 && pictures.data.hits.length > 0) {
         appendPictures(pictures);
         window.document.addEventListener('scroll', onscroll);
+        return;
+        // one more check, if we try to get more pictures, but there is no more data
+      } else if (pictures.data.hits.length === 0) {
+        window.document.removeEventListener('scroll', infScroll);
+        Notify.warning(
+          "We're sorry, but you've reached the end of search results."
+        );
         return;
       }
       appendPictures(pictures);

@@ -81,10 +81,10 @@ const onscroll = throttle(() => {
 
 const infScroll = throttle(() => {
   if (
-    window.scrollY + window.innerHeight +0.25 >=
+    window.scrollY + window.innerHeight +1 >=
     document.documentElement.scrollHeight
   ) {
-    Loading.dots()
+
     fetchMoreData();
     Loading.remove()
   }
@@ -103,6 +103,7 @@ function onNoScroll() {
 }
 
 function fetchMoreData() {
+  Loading.dots();
   pictureApi
     .fetchData()
     .then(pictures => {

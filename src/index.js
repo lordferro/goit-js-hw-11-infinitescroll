@@ -1,12 +1,12 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import { loadMoreBtn } from './js/loadMoreBtn';
+import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import PictureApi from './js/pictureApi';
 // Описан в документации
 import SimpleLightbox from 'simplelightbox';
 // Дополнительный импорт стилей
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.js';
-import InfiniteScroll from 'infinite-scroll';
+
 
 var throttle = require('lodash.throttle');
 
@@ -16,12 +16,7 @@ const refs = {
 };
 const pictureApi = new PictureApi();
 
-// let infScroll = new InfiniteScroll(refs.gallery, {
-//   path: 
-// })
-
 refs.form.addEventListener('submit', onFormSubmit);
-loadMoreBtn.button.addEventListener('click', fetchMoreData);
 
 function onFormSubmit(event) {
   event.preventDefault();
@@ -33,21 +28,20 @@ function onFormSubmit(event) {
 
   pictureApi.searchQuery = event.currentTarget.elements.searchQuery.value;
 
-  loadMoreBtn.hide();
   pictureApi.pageReset();
   clearMarkup();
-  loadMoreBtn.show();
-  loadMoreBtn.disable();
   fetchData(); 
   refs.form.reset();
 }
 
 async function fetchData() {
   pictureApi
-    .fetchData()
-    .then(pictures => {
+  .fetchData()
+  .then(pictures => {
+      window.document.removeEventListener('scroll', onscroll);
+      window.document.removeEventListener('scroll', infScroll);
       if (pictures.data.hits.length === 0) {
-        loadMoreBtn.hide();
+    
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
@@ -56,40 +50,45 @@ async function fetchData() {
         pictures.data.hits.length < 40 &&
         pictures.data.hits.length > 0
       ) {
-        loadMoreBtn.hide();
         appendPictures(pictures);
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         onNoScroll();
-        let scrolled = 0;
         window.document.addEventListener('scroll', onscroll);
 
         return;
       } else {
-        window.document.removeEventListener('scroll', onscroll);
-        loadMoreBtn.enable();
         Notify.success(`Hooray! We found ${pictures.data.totalHits} images.`);
         appendPictures(pictures);
+        window.document.addEventListener("scroll", infScroll)
       }
     })
     .catch(error => {
-      loadMoreBtn.hide();
     Notify.failure(`there is an error ${error}`);
     });
 }
 
 // create a variable to cancel event listener later
-var onscroll = throttle(onScroll, 800);
-
-function onScroll() {
-  const userViewHeight = document.documentElement.clientHeight;
-  const totalHeight = document.documentElement.scrollHeight;
-  let scrolled = window.pageYOffset;
-  if (totalHeight - scrolled - 1 < userViewHeight) {
+const onscroll = throttle(() => {
+  if (
+    window.scrollY + window.innerHeight + 0.25 >=
+    document.documentElement.scrollHeight
+  ) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
   }
-}
+}, 800);
+
+const infScroll = throttle(() => {
+  if (
+    window.scrollY + window.innerHeight +0.25 >=
+    document.documentElement.scrollHeight
+  ) {
+    Loading.dots()
+    fetchMoreData();
+    Loading.remove()
+  }
+}, 800);
 
 function onNoScroll() {
   if (
@@ -108,13 +107,10 @@ function fetchMoreData() {
     .fetchData()
     .then(pictures => {
       if (pictures.data.hits.length < 40 && pictures.data.hits.length > 0) {
-        loadMoreBtn.hide();
         appendPictures(pictures);
-        let scrolled = 0;
         window.document.addEventListener('scroll', onscroll);
         return;
       }
-      loadMoreBtn.enable();
       appendPictures(pictures);
     })
     .catch(error => error);
